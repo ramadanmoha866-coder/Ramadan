@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+import { SpotClient } from '@siebly/kraken-api';
+// or if you prefer require:
+// const { SpotClient } = require('@siebly/kraken-api');
+
+// For public endpoints, API credentials are optional
+const publicClient = new SpotClient();
+
+// For private endpoints, provide API credentials
+const client = new SpotClient({
+  apiKey: 'your-api-key',
+  apiSecret: 'your-base64-encoded-private-key',
+});
+
+// Public API Examples
+
+// Get ticker information
+const ticker = await publicClient.getTicker({
+  pair: 'XBTUSD',
+});
+console.log('Ticker: ', ticker);
+
+// Get order book
+const orderBook = await publicClient.getOrderBook({
+  pair: 'XBTUSD',
+  count: 10,
+});
+console.log('Order Book: ', orderBook);
+
+// Private API Examples (requires authentication)
+
+// Submit a market order
+client
+  .submitOrder({
+    ordertype: 'market',
+    type: 'buy',
+    volume: '0.01',
+    pair: 'XBTUSD',
+    cl_ord_id: client.generateNewOrderID(),
+  })
+  .then((result) => {
+    console.log('Market Order Result: ', result);
+  })
+  .catch((err) => {
+    console.error('Error: ', err);
+  });
+
+// Submit a limit order
+client
+  .submitOrder({
+    ordertype: 'limit',
+    type: 'buy',
+    volume: '0.0001',
+    pair: 'XBTUSD',
+    price: '10000',
+    cl_ord_id: client.generateNewOrderID(),
+  })
+  .then((result) => {
+    console.log('Limit Order Result: ', result);
+  })
+  .catch((err) => {
+    console.error('Error: ', err);
+  });
+
+// Submit batch of orders (minimum 2, maximum 15)
+client
+  .submitBatchOrders({
+    pair: 'XBTUSD',
+    orders: [
+      {
+        ordertype: 'limit',
+        type: 'buy',
+        volume: '0.0001',
+        price: '10000.00',
+        timeinforce: 'GTC',
+        cl_ord_id: client.generateNewOrderID(),
+      },
+      {
+        ordertype: 'limit',
+        type: 'buy',
+        volume: '0.0001',
+        price: '11111.00',
+        timeinforce: 'GTC',
+        cl_ord_id: client.generateNewOrderID(),
+      },
+      {
+        ordertype: 'limit',
+        type: 'sell',
+        volume: '0.0001',
+        price: '13000.00',
+        timeinforce: 'GTC',
+        cl_ord_id: client.generateNewOrderID(),
+      },
+    ],
+  })
+  .then((result) => {
+    console.log('Batch Order Result: ', JSON.stringify(result, null, 2));
+  })
+  .catch((err) => {
+    console.error('Error: ', err);
+  });
+
+// Get account balances
+client
+  .getAccountBalance()
+  .then((balance) => {
+    console.log('Account Balance: ', balance);
+  })
+  .catch((err) => {
+    console.error('Error: ', err);
+  });import { DerivativesClient } from '@siebly/kraken-api';
+// or if you prefer require:
+// const { DerivativesClient } = require('@siebly/kraken-api');
+
+// For public endpoints, API credentials are optional
+const publicClient = new DerivativesClient();
+
+// For private endpoints, provide API credentials
+const client = new DerivativesClient({
+  apiKey: 'your-api-key',
+  apiSecret: 'your-api-secret',
+});
+
+// Public API Examples
+
+// Get order book for a specific instrument
+const orderBook = await publicClient.getOrderBook({
+  symbol: 'PF_XBTUSD',
+});
+console.log('Futures Order Book: ', orderBook);
+
+// Get ticker information
+const ticker = await publicClient.getTickers({
+  symbol: 'PF_XBTUSD',
+});
+console.log('Futures Ticker: ', ticker);
+
+// Private API Examples (requires authentication)
+
+// Get account balances
+client
+  .getAccountsDetails()
+  .then((accounts) => {
+    console.log('Accounts Details: ', accounts);
+  })
+  .catch((err) => {
+    console.error('Error: ', err);
+  });
+
+// Submit a limit order
+client
+  .submitOrder({
+    orderType: 'lmt',
+    symbol: 'PF_ETHUSD', // Perpetual ETH/USD
+    side: 'buy',
+    size: 0.01, // Contract size
+    limitPrice: 1000,
+    cliOrdId: client.generateNewOrderID(),
+  })
+  .then((result) => {
+    console.log('Limit Order Result: ', JSON.stringify(result, null, 2));
+  })
+  .catch((err) => {
+    console.error('Error: ', err);
+  });
+<script src="script.js"></script>
+</body>
+</html>
